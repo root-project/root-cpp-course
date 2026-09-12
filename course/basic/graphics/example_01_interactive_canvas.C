@@ -17,8 +17,3 @@ void example_01_interactive_canvas() {
   h.DrawClone();
   canvas->Draw();
 }
-
-int main() {
-  example_01_interactive_canvas();
-  return 0;
-}
