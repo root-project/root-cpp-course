@@ -12,14 +12,14 @@ void write(std::string_view dataset_name, std::string_view file_name,
 
   std::mt19937 rng{std::random_device{}()};
 
-  std::normal_distribution<double> gaus{15, 5};
+  std::normal_distribution<float> gaus{15, 5};
   std::uniform_int_distribution<std::size_t> n_particles{0, 5};
 
   // Writing API: TTree::Branch. Creates a new top-level branch with a certain
   // name, taking values from the object pointed to by the address passed as
   // second parameter. The pointer can be typed: TTree will infer from the type
   // the information to properly store the data to disk.
-  unsigned event_id{0};
+  std::uint64_t event_id{0};
   std::vector<float> muon_pt{};
   tree->Branch("event_id", &event_id);
   tree->Branch("muon_pt", &muon_pt);
@@ -50,7 +50,7 @@ void read(std::string_view dataset_name, std::string_view file_name,
   // Reading API: TTree::SetBranchAddress. The on-disk data will be read into
   // the memory location pointed at by the second parameter.
   // POD type: pass by pointer to value
-  unsigned event_id{0};
+  std::uint64_t event_id{0};
   // Class type: pass by pointer to pointer
   std::vector<float> *muon_pt{nullptr};
   tree->SetBranchAddress("event_id", &event_id);
