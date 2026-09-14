@@ -46,7 +46,7 @@ public:
   std::string GetActionName() { return "MaxActionHelper"; }
 };
 
-void example_05_custom_action() {
+void exercise_02_custom_action() {
   // Enable multi-thread running
   // ROOT::EnableImplicitMT();
 
@@ -58,6 +58,6 @@ void example_05_custom_action() {
 }
 
 int main() {
-  example_05_custom_action();
+  exercise_02_custom_action();
   return 0;
 }
