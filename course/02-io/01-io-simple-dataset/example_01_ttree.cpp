@@ -41,8 +41,7 @@ void write(std::string_view dataset_name, std::string_view file_name,
   file->Write();
 }
 
-void read(std::string_view dataset_name, std::string_view file_name,
-          unsigned n_entries) {
+void read(std::string_view dataset_name, std::string_view file_name) {
   std::unique_ptr<TFile> file{TFile::Open(file_name.data())};
   // No unique_ptr here: TFile retains ownership of the object by default
   auto *tree = file->Get<TTree>(dataset_name.data());
@@ -56,7 +55,7 @@ void read(std::string_view dataset_name, std::string_view file_name,
   tree->SetBranchAddress("event_id", &event_id);
   tree->SetBranchAddress("muon_pt", &muon_pt);
 
-  for (auto i = 0; i < n_entries; i++) {
+  for (auto i = 0; i < tree->GetEntriesFast(); i++) {
     // Reading API: TTree::GetEntry. Moves a cursor to the entry index
     // parameter, reading data into the addresses previously set
     tree->GetEntry(i);
@@ -74,7 +73,7 @@ void example_01_ttree() {
   constexpr auto n_entries{10};
 
   write(dataset_name, file_name, n_entries);
-  read(dataset_name, file_name, n_entries);
+  read(dataset_name, file_name);
 }
 
 int main() {

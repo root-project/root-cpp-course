@@ -46,8 +46,7 @@ void write(std::string_view dataset_name, std::string_view file_name,
   // unwritten data to disk and closes the attached ROOT file.
 }
 
-void read(std::string_view dataset_name, std::string_view file_name,
-          unsigned n_entries) {
+void read(std::string_view dataset_name, std::string_view file_name) {
   // Reading API: The RNTupleReader is the entry point to reading an
   // RNTuple stored in a single file. Without passing a model object, a default
   // one is created internally by reading the on-disk dataset schema
@@ -73,7 +72,7 @@ void example_04_rntuple_view() {
   constexpr auto n_entries{10};
 
   write(dataset_name, file_name, n_entries);
-  read(dataset_name, file_name, n_entries);
+  read(dataset_name, file_name);
 }
 
 int main() {

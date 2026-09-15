@@ -46,8 +46,7 @@ void write(std::string_view dataset_name, std::string_view file_name,
   // unwritten data to disk and closes the attached ROOT file.
 }
 
-void read(std::string_view dataset_name, std::string_view file_name,
-          unsigned n_entries) {
+void read(std::string_view dataset_name, std::string_view file_name) {
 
   // The RNTupleModel represents the dataset schema
   auto model = ROOT::RNTupleModel::Create();
@@ -79,7 +78,7 @@ void example_03_rntuple_impose_model() {
   constexpr auto n_entries{10};
 
   write(dataset_name, file_name, n_entries);
-  read(dataset_name, file_name, n_entries);
+  read(dataset_name, file_name);
 }
 
 int main() {

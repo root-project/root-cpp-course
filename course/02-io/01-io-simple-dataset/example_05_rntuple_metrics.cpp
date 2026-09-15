@@ -51,8 +51,7 @@ void write(std::string_view dataset_name, std::string_view file_name,
   // unwritten data to disk and closes the attached ROOT file.
 }
 
-void read(std::string_view dataset_name, std::string_view file_name,
-          unsigned n_entries) {
+void read(std::string_view dataset_name, std::string_view file_name) {
 
   auto reader = ROOT::RNTupleReader::Open(dataset_name, file_name);
 
@@ -92,7 +91,7 @@ void example_05_rntuple_metrics() {
   constexpr auto n_entries{10000};
 
   write(dataset_name, file_name, n_entries);
-  read(dataset_name, file_name, n_entries);
+  read(dataset_name, file_name);
 }
 
 int main() {

@@ -51,8 +51,7 @@ void write(std::string_view dataset_name, std::string_view file_name,
   // unwritten data to disk and closes the attached ROOT file.
 }
 
-void inspect(std::string_view dataset_name, std::string_view file_name,
-             unsigned n_entries) {
+void inspect(std::string_view dataset_name, std::string_view file_name) {
 
   // The RNTupleInspector is the entry point to a series of utilities
   // to query on-disk information about RNTuple. See its documentation at
@@ -76,7 +75,7 @@ void example_06_rntuple_inspector() {
   constexpr auto n_entries{10000};
 
   write(dataset_name, file_name, n_entries);
-  inspect(dataset_name, file_name, n_entries);
+  inspect(dataset_name, file_name);
 }
 
 int main() {
