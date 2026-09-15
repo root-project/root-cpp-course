@@ -63,12 +63,3 @@ TBranch *TTree::Branch(const char *name, T *obj, Int_t bufsize = 32000,
                        Int_t splitlevel = 99);
 ```
 What happens to the size of the file if the value of `splitlevel`is zero?
-
-`RNTuple` does not natively offer such interface. However, the behaviour of the I/O can be steered with the XML selection file, when creating dictionaries.
-We can try that with the following syntax:
-
-```xml
-  <class name="myVector" rntupleStreamerMode="true"/>
-```
-
-What is the effect of this change on the size on disk of the file that contains the `RNTuple` instance?

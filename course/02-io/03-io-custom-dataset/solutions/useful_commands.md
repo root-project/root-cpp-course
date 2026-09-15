@@ -1,6 +1,6 @@
 Create the dictionary
 ```
-rootcling -f dict.cc -rmf myVector.rootmap -rml libmyVector.so myVector.h [sel.xml,LinkDef.h]
+rootcling -f dict.cc -rmf myVector.rootmap -rml libmyVector.so myVector.h LinkDef.h
 ```
 Build the library
 ```
