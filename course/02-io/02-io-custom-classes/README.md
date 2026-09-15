@@ -7,14 +7,15 @@ Create a class, `myVector`, that represent a three-dimensional vector. For the c
 You can make this exercise even more realistic, by creating a mechanism to fill such classes with random numbers, e.g. a function. Do not make the numbers truly random, but reproducible, i.e. by choosing a seed. It will become handy when it's time to read our instances back and check they are sane.
 Moreover, you can add a `print()` method to the class, in order to be able to quickly verify its content.
 
-Remember that using the `ClassDef` macro is not strictly necessary to perform I/O, but strongly recommended.
+> [!TIP]
+> Remember that using the `ClassDef` macro is not strictly necessary to perform I/O, but strongly recommended.
 
 ## Write and read custom objects
 Write now a ROOT C++ macro to write a `myVector` instance on disk.
 
-*Does this work if you do not create a dictionary? If yes, what could be the problems one may encounter in more complicated setups?*
+*Does this work if you do not create a dictionary? If yes, what could be the problems one may encounter in more complicated setups, for example in presence of evolution of the layout of classes?*
 
-Repeat the above also with a `std::vector<myVector>`. Is the behaviour the identical as before? Why?
+Repeat the above also with a `std::vector<myVector>`. *Is the behaviour the identical as before? Why?*
 
 ## Dictionaries
 In order to proceed, we'll need now to create dictionaries for the `myVector` and `std::vector<myVector>` classes.
@@ -34,7 +35,10 @@ To build a shared library made of [position independent code](https://en.wikiped
 g++ -shared -fPIC `root-config --libs --cflags` -o libmyVector.so <source files separated by a space>
 ```
 (In case you prefer to use Clang, no worries: the invocation is identical!)
-The `root-config --libs --cflags` command simply prompts all the necessary flags to correctly obtain binary code using ROOT components (try it, and see what is the result to know more).
+
+> [!NOTE]
+> The `root-config --libs --cflags` command simply prompts all the necessary flags to correctly obtain binary code using ROOT components (try it, and see what is the result to know more).
+
 Remember: the library, the pcm file, and the rootmap should be either in the `./` directory or in the `LD_LIBRARY_PATH`
 
 ## Write and read custom objects, with dictionaries this time
@@ -54,7 +58,8 @@ You can also remove the rootmap now. Writing will not work any more: the library
 1. Transform the macro into an executable, to which the library containing the dictionary is linked
 2. Manually load the library in the code, with the invocation `gSystem->Load("libmyVector.so")`
 
-ROOT is also used within the software stacks of HEP experiments. At runtime, these systems can easily end up dealing with hundreds of shared libraries. This is also why ROOT provides such a rich support to deal with shared libraries.
+> [!NOTE]
+> ROOT is also used within the software stacks of HEP experiments. At runtime, these systems can easily end up dealing with hundreds of shared libraries. This is also why ROOT provides such a rich support to deal with shared libraries.
 
 ## Reading back from files
 Now that we have our instances in a ROOT file, we can read them back.
@@ -73,7 +78,7 @@ Write a simple macro or program to read back the file we have just written.
 
 *Are the double precision floating point numbers representing what was written in single precision?*
 
-If you did not forget to increase the class version via the `ClassDef` pre-processor macro, try to use the previous one and read the file: what is ROOT complaining about?
+If you did not forget to increase the class version via the `ClassDef` pre-processor macro, try to use the previous one and read the file: *what is ROOT complaining about?*
 
 ### Bonus: More about ROOT's Type System
 Let's go back to the evolved class, the one containing a transient data member (`m_mag`).
