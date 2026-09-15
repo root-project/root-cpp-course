@@ -1,7 +1,11 @@
 *.out
 *.root
+# Allow input ROOT files to be stored under data subdirectories
+!**/data/*
 *.png
 *.dSYM
 *.pcm
 *.rootmap
 *.tmp
+*.so
+*Dict*
