@@ -1,4 +1,5 @@
 # root-cpp-course
+[![SWAN](https://swan.docs.cern.ch/images/logos/open_in_swan.svg)](https://cern.ch/swanserver/cgi-bin/go?projurl=https://github.com/root-project/root-cpp-course.git)
 [![Github Codespace](https://img.shields.io/badge/open-GH_Codespaces-blue?logo=github)](https://codespaces.new/root-project/root-cpp-course?quickstart=1)
 
 This repository includes material for a course on ROOT based on C++. It features the following topics:
