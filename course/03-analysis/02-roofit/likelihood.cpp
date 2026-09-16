@@ -1,6 +1,6 @@
-// likelihood.C — Part 3 of the course: likelihood anatomy.
+// likelihood.cpp : Part 3 of the course: likelihood anatomy.
 //
-// Reuses the HistFactory workspace produced by fit.C
+// Reuses the HistFactory workspace produced by histfactory.cpp
 // (results/meas_combined_meas_model.root) and dissects the likelihood that
 // the fit actually minimized:
 //
@@ -14,8 +14,6 @@
 //   2. a 2D likelihood contour in (mu, alpha_theta) at 1 and 2 sigma, to be
 //      compared with the HESSE covariance ellipse: identical only if the NLL
 //      is exactly parabolic.
-//
-// Run after fit.C: root -b -q likelihood.C
 
 #include <iostream>
 
@@ -24,6 +22,7 @@
 #include "RooAbsReal.h"
 #include "RooFitResult.h"
 #include "RooMinimizer.h"
+#include "RooMsgService.h"
 #include "RooPlot.h"
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
@@ -39,7 +38,7 @@ void scan1D(RooAbsReal &nll, RooRealVar &var, double lo, double hi,
             const char *xTitle, TCanvas &c, int pad) {
   c.cd(pad);
   RooPlot *frame = var.frame(RooFit::Range(lo, hi), RooFit::Title(xTitle));
-  nll.plotOn(frame, RooFit::ShiftToZero());
+  nll.plotOn(frame, RooFit::ShiftToZero(), RooFit::LineColor(kBlack));
   RooAbsReal *pll = nll.createProfile(var);
   pll->plotOn(frame, RooFit::ShiftToZero(), RooFit::LineColor(kRed));
   frame->SetMinimum(0.);
@@ -55,18 +54,28 @@ void scan1D(RooAbsReal &nll, RooRealVar &var, double lo, double hi,
 } // namespace
 
 void likelihood() {
-  // --- load the workspace written by fit.C ---------------------------------
+
+  RooRealVar::enableSilentClipping();
+
+  // --- load the workspace written by histfactory.cpp ---------------------------------
   TFile f("results/meas_combined_meas_model.root");
   auto *w = f.Get<RooWorkspace>("combined");
   if (!w) {
     std::cerr
-        << "run fit.C first (results/meas_combined_meas_model.root missing)\n";
+        << "run histfactory.cpp first (results/meas_combined_meas_model.root missing)\n";
     return;
   }
   auto *pdf = (RooAbsPdf *)w->pdf("simPdf");
   auto *data = w->data("obsData");
   auto *mu = w->var("mu");
   auto *alpha = w->var("alpha_theta");
+
+  // Quell RooFit chatter below WARNING for the rest of the macro:
+  // RooMinimizer emits an INFO note ("no discrete parameters ...") on every
+  // minimize() call, i.e. once per point of each profile scan below.
+  // PrintLevel only controls Minuit's own output, hence the stream-level mute.
+  const auto savedKillBelow = RooMsgService::instance().globalKillBelow();
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
   // re-fit quietly so all floating parameters sit at the minimum
   std::unique_ptr<RooFitResult> res(pdf->fitTo(*data, RooFit::Save(),
@@ -103,7 +112,14 @@ void likelihood() {
   cnt->Draw();
   c2.SaveAs("likelihood_contour.pdf");
 
+  RooMsgService::instance().setGlobalKillBelow(savedKillBelow);
+
   std::cout << "wrote likelihood_scan.pdf and likelihood_contour.pdf\n"
             << "check: the red profile curves cross DeltaNLL=0.5 at ~ +/- the "
                "HESSE errors above\n";
+}
+
+int main() {
+  likelihood();
+  return 0;
 }

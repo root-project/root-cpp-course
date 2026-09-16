@@ -1,6 +1,6 @@
-// unbinned.C — Part 1 of the course: the *analytic-shape* fit.
+// unbinned.cpp : Part 1 of the course: the *analytic-shape* fit.
 //
-// The same data.root NTuple that Part 2 (fit.C) analyses with templates is
+// The same data.root NTuple that Part 2 (histfactory.cpp) analyses with templates is
 // here fitted unbinned in the mass dimension. This works because we assume
 // the shapes to be analytically tractable: a Gaussian signal peak at 125 GeV
 // on an exponential continuum. (Part 2 is the answer to: "and if they
@@ -13,8 +13,6 @@
 //   2. Extended maximum-likelihood fit: model = Ns*sig + Nb*bkg with the
 //      yields as fit parameters, peak position and background slope floating.
 //   3. Closure: fitted signal yield vs. the expectation from physics.h.
-//
-// Run: root -b -q unbinned.C
 
 #include <cmath>
 #include <iostream>
@@ -35,9 +33,8 @@ void unbinned() {
   // --- 1. selected masses out of RDataFrame -------------------------------
   ROOT::RDataFrame dat("data", "data.root");
   auto masses =
-      dat.Define("aeta", [](double eta) { return std::fabs(eta); }, {"eta"})
-          .Filter([](double pt) { return pt > 20.; }, {"pt"})
-          .Filter([](double aeta) { return aeta < 2.2; }, {"aeta"})
+      dat.Filter([](double pt) { return pt > 20.; }, {"pt"})
+          .Filter([](double eta) { return std::abs(eta) < 2.2; }, {"eta"})
           .Take<double>("mass");
 
   RooRealVar m("mass", "m", toy::kMassMin, toy::kMassMax, "GeV");
@@ -50,16 +47,16 @@ void unbinned() {
 
   // --- 2. analytic model: Gaussian peak + exponential continuum ------------
   // The signal position floats (a classic), the width is assumed known from
-  // resolution studies. Play with these choices — see EXERCISES.md.
+  // resolution studies.
   RooRealVar mean("mean", "peak position", toy::kMass0 - 0.5, 120., 130.);
-  RooRealVar width("width", "peak width", toy::kMassSigma);
+  RooRealVar width("width", "peak width", toy::kMassSigma, 0.01 * toy::kMassSigma, 100 * toy::kMassSigma);
   width.setConstant(true);
   RooGaussian sig("sig", "signal", m, mean, width);
 
   // RooExponential parametrizes pdf(m) ~ exp(slope*m), so slope = -1/25 GeV^-1
   RooRealVar slope("slope", "background slope", -1. / toy::kMassSlope, -0.08,
                    0.);
-  RooExponential bkg("bkg", "background", m, slope);
+  // TODO: define bkg function here (exponential):
 
   // Extended model: the yields themselves are fit parameters. Poisson
   // fluctuations of the total event count are then part of the likelihood.
@@ -67,7 +64,12 @@ void unbinned() {
                   2. * ds.numEntries());
   RooRealVar nbkg("nbkg", "background yield", 0.8 * ds.numEntries(), 0.,
                   2. * ds.numEntries());
-  RooAddPdf model("model", "sig+bkg", {sig, bkg}, {nsig, nbkg});
+
+  // TODO: once the background component is defined, enable it in the RooAddPdf
+  RooAddPdf model("model", "sig+bkg",
+          {sig /*, bkg*/},
+          {nsig /*, nbkg*/}
+          );
 
   std::unique_ptr<RooFitResult> res(model.fitTo(
       ds, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::PrintEvalErrors(-1)));
@@ -102,4 +104,9 @@ void unbinned() {
   frame->Draw();
   c.SaveAs("unbinned_fit.pdf");
   std::cout << "wrote unbinned_fit.pdf\n";
+}
+
+int main() {
+  unbinned();
+  return 0;
 }

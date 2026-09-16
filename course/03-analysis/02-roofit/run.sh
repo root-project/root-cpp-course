@@ -9,16 +9,16 @@ set -e
 cd "$(dirname "$0")"
 
 echo "=== step 1: simulator NTuples ==="
-root -b -q make_toys.C
+root -b -q make_toys.cpp
 echo
 echo "=== part 1: unbinned analytic-shape fit ==="
-root -b -l -q unbinned.C
+root -b -l -q unbinned.cpp
 echo
 echo "=== part 2a: RDF analysis (+Vary histograms) ==="
-root -b -l -q analysis.C
+root -b -l -q analysis.cpp
 echo
 echo "=== part 2b: HistFactory fit ==="
-root -b -l -q fit.C
+root -b -l -q histfactory.cpp
 echo
 echo "=== part 3: likelihood anatomy ==="
-root -b -l -q likelihood.C
+root -b -l -q likelihood.cpp

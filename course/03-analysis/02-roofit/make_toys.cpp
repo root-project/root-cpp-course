@@ -1,4 +1,4 @@
-// make_toys.C — NTuple production layer.
+// make_toys.cpp : NTuple production layer.
 //
 // Produces two files from the simulator in physics.h:
 //
@@ -13,8 +13,6 @@
 //               from s(x) with mu_true = kMuNom and background events drawn
 //               from b(x; kThetaTrue). The analysis must recover kThetaTrue
 //               without ever seeing it.
-//
-// Run: root -b -q make_toys.C
 
 #include <iostream>
 
@@ -82,4 +80,9 @@ void make_toys() {
               << " + bkg " << nBkg << ", theta_true = " << toy::kThetaTrue
               << ")\n";
   }
+}
+
+int main() {
+  make_toys();
+  return 0;
 }

@@ -1,10 +1,11 @@
-// analysis.C — RDataFrame analysis over the toy NTuples.
+// analysis.cpp : RDataFrame analysis over the toy NTuples.
 //
 //  * Event transformations: |eta| folding, azimuth folded into [0, pi), then
 //    a signal-enriching selection: pt > 20 GeV and |eta| < 2.2.
-//  * Analysis observable: aeta = |eta| in 8 bins of [0, 2.2]. The signal is a
-//    central bump; the background falls as exp(-theta * aeta), so the bin-to-
-//    bin shape of the background measures theta.
+//  * Analysis observable: std::abs(eta) = |eta| in 8 bins of [0, 2.2]. The
+//  signal is a
+//    central bump; the background falls as exp(-theta * std::abs(eta)), so the
+//    bin-to- bin shape of the background measures theta.
 //  * One event loop computes the nominal histograms AND the up/down weight
 //    variations for both simulator parameters via RDF's Vary:
 //      sig_w -> mu      up/down  ("mu:mu_up", "mu:mu_down")
@@ -14,8 +15,6 @@
 //
 //  Output: hists.root with h_sig, h_sig_mu_up/down, h_bkg,
 //  h_bkg_theta_up/down, h_data.
-//
-// Run: root -b -q analysis.C
 
 #include <cmath>
 #include <iostream>
@@ -39,7 +38,7 @@ void analysis() {
                   [](double phi) { return phi < 0. ? phi + toy::kPi : phi; },
                   {"phi"})
           .Filter([](double pt) { return pt > 20.; }, {"pt"}, "pt > 20 GeV")
-          .Filter([](double aeta) { return aeta < 2.2; }, {"aeta"},
+          .Filter([](double eta) { return std::abs(eta) < 2.2; }, {"eta"},
                   "|eta| < 2.2")
           // up/down variations of the two physics weights, computed
           // from kinematics only (mu and theta act on weights, nothing
@@ -109,4 +108,9 @@ void analysis() {
 
   std::cout << "\nCut flow (MC, unweighted event counts):\n";
   mc.Report()->Print();
+}
+
+int main() {
+  analysis();
+  return 0;
 }
