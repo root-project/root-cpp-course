@@ -7,14 +7,13 @@
 //    central bump; the background falls as exp(-theta * std::abs(eta)), so the
 //    bin-to- bin shape of the background measures theta.
 //  * One event loop computes the nominal histograms AND the up/down weight
-//    variations for both simulator parameters via RDF's Vary:
-//      sig_w -> mu      up/down  ("mu:mu_up", "mu:mu_down")
+//    variation of the background nuisance parameter via RDF's Vary:
 //      bkg_w -> theta   up/down  ("bkg_shape:theta_up", "bkg_shape:theta_down")
 //    The varied weights are recomputed from the event kinematics alone — the
-//    same reweighting the simulator itself uses.
+//    same reweighting the simulator itself uses. The signal strength mu is a
+//    pure normalization parameter and needs no template variation.
 //
-//  Output: hists.root with h_sig, h_sig_mu_up/down, h_bkg,
-//  h_bkg_theta_up/down, h_data.
+//  Output: hists.root with h_sig, h_bkg, h_bkg_theta_up/down, h_data.
 
 #include <cmath>
 #include <iostream>
@@ -40,19 +39,9 @@ void analysis() {
           .Filter([](double pt) { return pt > 20.; }, {"pt"}, "pt > 20 GeV")
           .Filter([](double eta) { return std::abs(eta) < 2.2; }, {"eta"},
                   "|eta| < 2.2")
-          // up/down variations of the two physics weights, computed
-          // from kinematics only (mu and theta act on weights, nothing
+          // up/down variation of the theta physics weight, computed
+          // from kinematics only (theta acts on weights, nothing
           // else — re-running the sim is never needed)
-          .Vary(
-              "sig_w",
-              [](double eta, double phi, double pt, double mass) {
-                return ROOT::RVec<double>{
-                    toy::sig_weight(eta, phi, pt, mass,
-                                    toy::kMuNom + toy::kMuDelta),
-                    toy::sig_weight(eta, phi, pt, mass,
-                                    toy::kMuNom - toy::kMuDelta)};
-              },
-              {"eta", "phi", "pt", "mass"}, {"mu_up", "mu_down"}, "mu")
           .Vary(
               "bkg_w",
               [](double eta, double phi, double pt, double mass) {
@@ -73,7 +62,6 @@ void analysis() {
       ROOT::RDF::TH1DModel{"h_bkg", ";|#eta|;events", kNBins, 0., 2.2}, "aeta",
       "bkg_w");
 
-  auto vSig = ROOT::RDF::Experimental::VariationsFor(hSig);
   auto vBkg = ROOT::RDF::Experimental::VariationsFor(hBkg);
 
   // --- data loop: same selections, unweighted -----------------------------
@@ -89,16 +77,14 @@ void analysis() {
 
   // --- persist ------------------------------------------------------------
   TFile out("hists.root", "RECREATE");
-  vSig["nominal"].Write("h_sig");
+  hSig->Write("h_sig");
   vBkg["nominal"].Write("h_bkg");
-  vSig["mu:mu_up"].Write("h_sig_mu_up");
-  vSig["mu:mu_down"].Write("h_sig_mu_down");
   vBkg["bkg_shape:theta_up"].Write("h_bkg_theta_up");
   vBkg["bkg_shape:theta_down"].Write("h_bkg_theta_down");
   hData->Write("h_data");
 
   std::cout << "\nhists.root written. Yields after selection:\n"
-            << "  signal       : " << vSig["nominal"].Integral() << "\n"
+            << "  signal       : " << hSig->Integral() << "\n"
             << "  background   : " << vBkg["nominal"].Integral() << "\n"
             << "  bkg theta_up : " << vBkg["bkg_shape:theta_up"].Integral()
             << "\n"

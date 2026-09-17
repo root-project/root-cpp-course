@@ -46,7 +46,7 @@ constexpr double kNSim = 400000.;
 
 // Parameter of interest: signal strength mu
 constexpr double kMuNom = 1.0;
-constexpr double kMuDelta = 0.25; // up/down variation size (demo purposes)
+// (mu is a pure normalization: it needs no up/down template variation.)
 
 // Nuisance parameter: background eta slope theta
 constexpr double kThetaNom = 1.0;   // value assumed in the MC sample
